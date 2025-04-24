@@ -45,4 +45,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * The loans (borrow transactions) made by this user.
+     * One-to-Many relationship.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Loan, User>
+     */
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
+    /**
+     * Convenient access to borrowed copies through loans.
+     * Can be used to fetch all copies currently or previously borrowed.
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<Copy, Loan, User>
+     */
+    public function copies()
+    {
+        return $this->hasManyThrough(
+            Copy::class,
+            Loan::class,
+            'user_id',  // Foreign key on loans table
+            'id',       // Foreign key on copies table
+            'id',       // Local key on users table
+            'copy_id'   // Local key on loans table
+        );
+    }
 }
